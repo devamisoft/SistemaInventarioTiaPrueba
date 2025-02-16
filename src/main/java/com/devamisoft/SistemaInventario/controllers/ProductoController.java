@@ -1,4 +1,5 @@
 package com.devamisoft.SistemaInventario.controllers;
+import com.devamisoft.SistemaInventario.dtos.LocalProductoDTO;
 import com.devamisoft.SistemaInventario.dtos.ProductoDTO;
 import com.devamisoft.SistemaInventario.dtos.Response;
 import com.devamisoft.SistemaInventario.services.ProductoServices;
@@ -12,9 +13,10 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ProductoController {
     private final ProductoServices productoServices;
+    private final LocalProductoServices localProductoServices;
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'SUPERVISOR')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Response> createProducto(@RequestBody ProductoDTO productoDTO) {
         return ResponseEntity.ok(productoServices.createProducto(productoDTO));
     }
@@ -24,34 +26,49 @@ public class ProductoController {
         return ResponseEntity.ok(productoServices.getAllProductos());
     }
 
+    // Asignación de stock a local
+    @PostMapping("/asignar-stock")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Response> asignarStockALocal(@RequestBody LocalProductoDTO request) {
+        return ResponseEntity.ok(localProductoServices.asignarStock(request));
+    }
+
+    // Actualizar stock
+    @PutMapping("/actualizar-stock")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_BODEGUERO')")
+    public ResponseEntity<Response> actualizarStock(@RequestBody LocalProductoDTO request) {
+        return ResponseEntity.ok(localProductoServices.actualizarStock(request));
+    }
+
+    // Consultar stock por local
+    @GetMapping("/stock/local/{localId}")
+    public ResponseEntity<Response> getStockPorLocal(@PathVariable Long localId) {
+        return ResponseEntity.ok(localProductoServices.getStockPorLocal(localId));
+    }
+
+    // Consultar stock de un producto específico en un local
+    @GetMapping("/stock/{localId}/{productoId}")
+    public ResponseEntity<Response> getStockProducto(
+            @PathVariable Long localId,
+            @PathVariable Long productoId) {
+        return ResponseEntity.ok(localProductoServices.getStockProducto(localId, productoId));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Response> getProductoById(@PathVariable Long id) {
         return ResponseEntity.ok(productoServices.getProductoById(id));
     }
 
-    @GetMapping("/categoria/{categoriaId}")
-    public ResponseEntity<Response> getProductosByCategoria(@PathVariable Long categoriaId) {
-        return ResponseEntity.ok(productoServices.getProductosByCategoria(categoriaId));
-    }
-
-    @GetMapping("/codigo/{codigo}")
-    public ResponseEntity<Response> getProductoByCodigo(@PathVariable String codigo) {
-        return ResponseEntity.ok(productoServices.getProductosByCodigo(codigo));
-    }
-
-    @GetMapping("/empresa/{empresaId}")
-    public ResponseEntity<Response> getProductosByEmpresa(@PathVariable Long empresaId) {
-        return ResponseEntity.ok(productoServices.getProductosByEmpresa(empresaId));
-    }
-
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'SUPERVISOR')")
-    public ResponseEntity<Response> updateProducto(@PathVariable Long id, @RequestBody ProductoDTO productoDTO) {
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Response> updateProducto(
+            @PathVariable Long id,
+            @RequestBody ProductoDTO productoDTO) {
         return ResponseEntity.ok(productoServices.updateProducto(id, productoDTO));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Response> deleteProducto(@PathVariable Long id) {
         return ResponseEntity.ok(productoServices.deleteProducto(id));
     }

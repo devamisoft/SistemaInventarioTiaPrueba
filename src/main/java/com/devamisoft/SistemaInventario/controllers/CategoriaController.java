@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.*;
 public class CategoriaController {
     private final CategoriaServices categoriaServices;
 
-    @PostMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'SUPERVISOR')")
+    @PostMapping("/add")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Response> createCategoria(@RequestBody CategoriaDTO categoriaDTO) {
         return ResponseEntity.ok(categoriaServices.createCategoria(categoriaDTO));
     }
@@ -29,14 +29,15 @@ public class CategoriaController {
         return ResponseEntity.ok(categoriaServices.getCategoriaById(id));
     }
 
-    @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'SUPERVISOR')")
+    @PutMapping("/update/{id}")
+   // @PreAuthorize("hasAnyAuthority('ADMIN', 'SUPERVISOR')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Response> updateCategoria(@PathVariable Long id, @RequestBody CategoriaDTO categoriaDTO) {
         return ResponseEntity.ok(categoriaServices.updateCategoria(id, categoriaDTO));
     }
 
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Response> deleteCategoria(@PathVariable Long id) {
         return ResponseEntity.ok(categoriaServices.deleteCategoria(id));
     }

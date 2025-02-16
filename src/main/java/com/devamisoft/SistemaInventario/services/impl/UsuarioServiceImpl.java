@@ -146,14 +146,15 @@ public class UsuarioServiceImpl implements UsuarioServices {
 
     @Override
     public Response deleteUser(Long id) {
-        usuarioRepository.findById(id)
+        Usuarios usuarios = usuarioRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
 
-        usuarioRepository.deleteById(id);
+        usuarios.setEstado(0);
+        usuarioRepository.save(usuarios);
 
         return Response.builder()
                 .status(200)
-                .message("Usuario eliminado exitosamente")
+                .message("Usuario desactivado exitosamente")
                 .build();
     }
 }

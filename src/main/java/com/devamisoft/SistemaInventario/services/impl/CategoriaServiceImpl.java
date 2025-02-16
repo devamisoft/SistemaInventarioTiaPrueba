@@ -22,6 +22,12 @@ public class CategoriaServiceImpl implements CategoriaServices {
 
     @Override
     public Response createCategoria(CategoriaDTO categoriaDTO) {
+        if (categoriaRepository.existsByNombreIgnoreCase(categoriaDTO.getNombre())) {
+            return Response.builder()
+                    .status(400)
+                    .message("Ya existe una categoría con este nombre")
+                    .build();
+        }
         Categoria categoria = modelMapper.map(categoriaDTO, Categoria.class);
         categoriaRepository.save(categoria);
 
@@ -75,10 +81,21 @@ public class CategoriaServiceImpl implements CategoriaServices {
 
     @Override
     public Response deleteCategoria(Long id) {
-        if (!categoriaRepository.existsById(id)) {
-            throw new NotFoundException("Categoría no encontrada");
+        Categoria categoria = categoriaRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Categoría no encontrada"));
+
+        if (categoriaRepository.existsByIdCategoriaAndProductosIsNotEmpty(id)) {
+            // Borrado lógico si hay productos
+            categoria.setEstado(0);
+            categoriaRepository.save(categoria);
+
+            return Response.builder()
+                    .status(200)
+                    .message("Categoría desactivada porque tiene productos asociados")
+                    .build();
         }
-        categoriaRepository.deleteById(id);
+
+        categoriaRepository.delete(categoria);
 
         return Response.builder()
                 .status(200)
