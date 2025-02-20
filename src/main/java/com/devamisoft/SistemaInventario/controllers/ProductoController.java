@@ -2,6 +2,7 @@ package com.devamisoft.SistemaInventario.controllers;
 import com.devamisoft.SistemaInventario.dtos.LocalProductoDTO;
 import com.devamisoft.SistemaInventario.dtos.ProductoDTO;
 import com.devamisoft.SistemaInventario.dtos.Response;
+import com.devamisoft.SistemaInventario.services.LocalProductoServices;
 import com.devamisoft.SistemaInventario.services.ProductoServices;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
